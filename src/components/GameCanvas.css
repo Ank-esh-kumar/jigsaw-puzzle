@@ -1,0 +1,186 @@
+/* ===================================================================
+   GameCanvas.css — Game screen specific styles.
+   =================================================================== */
+
+/* --- 3D INFINITE CYBER GRID --- */
+.cyber-grid-wrapper {
+  position: absolute;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  overflow: hidden;
+  perspective: 600px;
+  z-index: -20;
+}
+
+.cyber-grid {
+  position: absolute;
+  bottom: -40%; left: -50%; 
+  width: 200%; height: 150%;
+  background-size: 60px 60px;
+  transform: rotateX(75deg);
+  animation: gridMove 2s linear infinite;
+}
+
+@keyframes gridMove {
+  0% { transform: rotateX(75deg) translateY(0); }
+  100% { transform: rotateX(75deg) translateY(60px); }
+}
+
+.grid-vignette {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  z-index: -15;
+  pointer-events: none;
+}
+
+/* --- CLAYMORPHISM WIN CARD ANIMATION --- */
+.win-card-animate {
+  animation: popInCard 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes popInCard {
+  0% { transform: scale(0.85); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* --- CLAY BUTTON STYLING --- */
+.clay-btn-sm {
+  border: none;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 
+    6px 6px 12px rgba(0, 0, 0, 0.5), 
+    -6px -6px 12px rgba(255, 255, 255, 0.03), 
+    inset 2px 2px 4px rgba(255, 255, 255, 0.08), 
+    inset -2px -2px 4px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s;
+}
+
+.clay-btn-sm:active {
+  box-shadow: 
+    inset 6px 6px 12px rgba(0, 0, 0, 0.6), 
+    inset -6px -6px 12px rgba(255, 255, 255, 0.05);
+  transform: translateY(2px);
+}
+
+.clay-btn-sm:hover { 
+  filter: brightness(1.2); 
+}
+
+/* --- PIECE PROGRESS INDICATOR --- */
+.piece-progress {
+  position: fixed;
+  top: max(20px, env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  padding: 8px 20px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.piece-progress .progress-bar-bg {
+  width: 120px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.piece-progress .progress-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* --- WIN SCREEN CONFETTI --- */
+.confetti-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 99;
+  overflow: hidden;
+}
+
+.confetti-piece {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  top: -10px;
+  opacity: 0;
+  animation: confettiFall 3s ease-in forwards;
+}
+
+.confetti-piece:nth-child(odd) {
+  border-radius: 50%;
+}
+
+@keyframes confettiFall {
+  0% {
+    opacity: 1;
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(100vh) rotate(720deg) scale(0.5);
+  }
+}
+
+/* --- PIECE SNAP GLOW EFFECT --- */
+@keyframes snapGlow {
+  0% { filter: brightness(1) drop-shadow(0 0 0px transparent); }
+  50% { filter: brightness(1.3) drop-shadow(0 0 15px var(--accent)); }
+  100% { filter: brightness(1) drop-shadow(0 0 0px transparent); }
+}
+
+/* --- GESTURE CONTROL STATUS OVERLAY --- */
+.gesture-status {
+  animation: slideUpIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideUpIn {
+  0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+  100% { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+.gesture-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-top-color: var(--accent, #00f0ff);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* --- GESTURE TOGGLE BUTTON --- */
+.gesture-toggle-btn {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+@keyframes gestureLoadBar {
+  0% { transform: translateX(-100%); }
+  50% { transform: translateX(0%); }
+  100% { transform: translateX(100%); }
+}
+
+/* --- GESTURE CONTROL INSTRUCTIONS (shown on first activation) --- */
+.gesture-instructions {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 300;
+  padding: 30px 40px;
+  max-width: 400px;
+  text-align: center;
+  animation: popInCard 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
