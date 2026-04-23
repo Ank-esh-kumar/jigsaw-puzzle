@@ -83,8 +83,8 @@ export function useGestureControl(isActive) {
         setStatus('Downloading AI models...');
         console.log("🤖 GESTURE: Loading MediaPipe WASM runtime...");
 
-        // Dynamically import to avoid breaking the bundle if the package is missing
-        const { FilesetResolver, HandLandmarker } = await import('@mediapipe/tasks-vision');
+        // Dynamically import directly from jsdelivr to avoid Vite build errors on Vercel
+        const { FilesetResolver, HandLandmarker } = await import(/* @vite-ignore */ 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.18/vision_bundle.mjs');
 
         // Use the same version as the installed npm package for compatibility
         const vision = await FilesetResolver.forVisionTasks(
