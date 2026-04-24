@@ -55,7 +55,6 @@ body {
   box-sizing: border-box;
   text-align: center;
   animation: floatPanel 6s ease-in-out infinite alternate;
-  background-image: url(../assets/images/img1.jpg);
   background-repeat: no-repeat;
   background-size: 100%;
 }
@@ -255,14 +254,15 @@ body {
   background-position: center;
   transform: scaleY(-1);
   opacity: 0.3;
-  mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.5) 0%, transparent 40%);
   -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.5) 0%, transparent 40%);
+  mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.5) 0%, transparent 40%);
 }
 
 .carousel-btn {
   position: absolute;
   z-index: 20;
   background: rgba(255, 255, 255, 0.1) !important;
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   border-radius: 50% !important;
   width: 50px;
@@ -385,14 +385,15 @@ body {
   background-position: center;
   transform: scaleY(-1);
   opacity: 0.3;
-  mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.5) 0%, transparent 40%);
   -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.5) 0%, transparent 40%);
+  mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.5) 0%, transparent 40%);
 }
 
 .carousel-btn {
   position: absolute;
   z-index: 20;
   background: rgba(255, 255, 255, 0.1) !important;
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   border-radius: 50% !important;
   width: 50px;
