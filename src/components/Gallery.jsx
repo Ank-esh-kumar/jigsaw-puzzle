@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import './Gallery.css';
 import img1 from '../assets/images/img1.jpg';
 import img2 from '../assets/images/img2.jpg';
@@ -15,9 +15,9 @@ const Gallery = ({ onSelect, setDiff, theme, colors, toggleTheme, setGestureEnab
   const [isExiting, setIsExiting] = useState(false);
 
   // --- EXPANDED AESTHETIC IMAGE SET (9 total) ---
-  const presets = [
+  const presets = useMemo(() => [
     img1, img2, img3, img4, img5, img6, img7, img8, img9
-  ];
+  ], []);
 
   // --- DYNAMIC BACKGROUND EFFECT ---
   useEffect(() => {
@@ -41,7 +41,7 @@ const Gallery = ({ onSelect, setDiff, theme, colors, toggleTheme, setGestureEnab
       wrapper.style.backdropFilter = 'blur(40px) saturate(150%)';
       wrapper.style.webkitBackdropFilter = 'blur(40px) saturate(150%)';
     }
-  }, [theme]);
+  }, [theme, presets]);
 
   // --- CAROUSEL STATE & HANDLERS ---
   const [activeIndex, setActiveIndex] = useState(0);
