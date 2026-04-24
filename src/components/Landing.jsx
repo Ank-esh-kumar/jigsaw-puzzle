@@ -372,8 +372,10 @@ export default function Landing({ onStart }) {
       <div className="ambient-background"></div>
 
       {/* GLOBAL BACKDROP FOR MODALS */}
-      <div className={`global-backdrop ${isAnyModalOpen ? 'active' : ''}`} onClick={() => { if (playerData.name) { setShowProfile(false); setIsHelpOpen(false); } }}></div>
-
+      <div 
+        className={`global-backdrop ${isAnyModalOpen ? 'active' : ''} ${showProfile || isHelpOpen ? 'cover-header' : ''}`} 
+        onClick={() => { if(playerData.name) { setShowProfile(false); setIsHelpOpen(false); } }}
+      ></div>
       {/* HEADER */}
       <header className="sys-header ios-glass">
         <div className="logo">
@@ -501,7 +503,7 @@ export default function Landing({ onStart }) {
                     <th>Mission</th>
                     <th>Grid</th>
                     <th>Time</th>
-                    <th>Errs</th>
+                    <th>Errors</th>
                     <th>Score</th>
                   </tr>
                 </thead>
@@ -549,15 +551,15 @@ export default function Landing({ onStart }) {
         style={{ zIndex: isAnyModalOpen ? 1400 : 2500 }}
       >
         <div className="icon-pulse text-green mb-3">✔️</div>
-        <h1 className="elegant-title rainbow-text">Gate Unlocked</h1>
+        <h1 className="elegant-title rainbow-text">Going to Console</h1>
         {isReturning ? (
           <>
-            <p className="elegant-subtitle">Main console connection remains established.</p>
+            <p className="elegant-subtitle">Console connection remains established.</p>
             <button className="ios-btn highlight-btn mt-4" style={{ width: '100%', maxWidth: '250px', margin: '0 auto' }} onClick={() => { setIsExiting(true); setTimeout(() => { if (onStart) onStart(); }, 1500); }}>Enter Console</button>
           </>
         ) : (
           <>
-            <p className="elegant-subtitle">Establishing secure connection to the main console...</p>
+            <p className="elegant-subtitle">Establishing secure connection to the console...</p>
             <div className="elegant-spinner mt-4"></div>
           </>
         )}
