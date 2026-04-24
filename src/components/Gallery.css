@@ -1,9 +1,7 @@
 /* ===================================================================
-   Gallery.css — Gallery page specific styles only.
-   All shared variables and utilities are in index.css.
+   Gallery.css — "Midnight Monochrome" Premium UI/UX Design
    =================================================================== */
 
-/* --- THE VIEWPORT LOCK --- */
 html,
 body {
   scroll-behavior: smooth;
@@ -23,26 +21,14 @@ body {
   justify-content: center;
   align-items: center;
   background-color: var(--bg-color);
+  transition: background-color 0.4s ease;
   z-index: 20;
 }
 
-/* --- EXIT ANIMATION --- */
-.gallery-wrapper.page-exit {
-  animation: cinematicExit 1.5s cubic-bezier(0.76, 0, 0.24, 1) forwards;
+.page-exit {
+  animation: cinematicExit 0.8s cubic-bezier(0.76, 0, 0.24, 1) forwards;
 }
 
-/* --- INTERACTIVE CANVAS BACKGROUND --- */
-.interactive-bg {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 0;
-  pointer-events: none;
-}
-
-/* --- MAIN PANEL --- */
 .main-panel {
   position: relative;
   z-index: 10;
@@ -59,7 +45,6 @@ body {
   background-size: 100%;
 }
 
-/* Custom scrollbar for main panel */
 .main-panel::-webkit-scrollbar {
   width: 8px;
 }
@@ -69,7 +54,7 @@ body {
 }
 
 .main-panel::-webkit-scrollbar-thumb {
-  background: var(--border-color);
+  background: rgba(255, 255, 255, 0.2);
   border-radius: 4px;
 }
 
@@ -83,95 +68,8 @@ body {
   }
 }
 
-/* --- PRESET GRID --- */
-.preset-grid {
-  display: flex;
-  gap: 20px;
-  justify-content: center;
-  margin: 30px 0;
-  flex-wrap: wrap;
-}
-
-.gallery-img {
-  width: 160px;
-  height: 110px;
-  object-fit: cover;
-  border-radius: 16px;
-  cursor: pointer;
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 4px 15px var(--shadow-color);
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.gallery-img:hover {
-  transform: scale(1.08) translateY(-5px);
-  border-color: var(--accent);
-  box-shadow: 0 15px 30px var(--shadow-color), 0 0 20px var(--shadow-glow);
-}
-
 .hidden-input {
   display: none;
-}
-
-/* --- SIDE MENU --- */
-.menu-toggle-fab {
-  position: absolute;
-  top: 30px;
-  right: 40px;
-}
-
-.side-menu {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 320px;
-  height: 100vh;
-  z-index: 50;
-  padding: 40px 30px;
-  box-sizing: border-box;
-  border-radius: 20px 0 0 20px;
-  transform: translateX(100%);
-  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.side-menu.open {
-  transform: translateX(0);
-}
-
-.menu-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.4);
-  -webkit-backdrop-filter: blur(4px);
-  backdrop-filter: blur(4px);
-  z-index: 40;
-  opacity: 0;
-  visibility: hidden;
-  transition: all 0.3s ease;
-}
-
-.menu-overlay.open {
-  opacity: 1;
-  visibility: visible;
-}
-
-@media (max-width: 768px) {
-  .main-panel {
-    padding: 24px;
-    border-radius: 24px;
-  }
-
-  .gallery-img {
-    width: 120px;
-    height: 80px;
-  }
-
-  .preset-grid {
-    gap: 12px;
-  }
 }
 
 .footer-copyright {
@@ -180,7 +78,7 @@ body {
   width: 100%;
   text-align: center;
   font-size: 0.8rem;
-  color: var(--text-muted);
+  color: var(--text-sub);
   z-index: 10;
   pointer-events: none;
 }
@@ -194,156 +92,19 @@ body {
   position: relative;
   margin: 40px 0;
   padding: 40px 0;
-  /* Extra padding ensures reflections aren't cut off */
   overflow: hidden;
-  /* Prevents page-breaking horizontal scroll on mobile */
   box-sizing: border-box;
 }
 
 .carousel-scene {
   position: relative;
-  /* Fluid width that shrinks on mobile, grows on desktop */
   width: clamp(200px, 40vw, 350px);
-
-  /* This guarantees it will ALWAYS be a perfect square */
   aspect-ratio: 1 / 1;
-
   display: flex;
   align-items: center;
   justify-content: center;
   transform-style: preserve-3d;
   transition: width 0.4s ease;
-}
-
-.carousel-card {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 20px;
-  transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
-  cursor: pointer;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
-}
-
-.carousel-card img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 20px;
-  border: 2px solid rgba(255, 255, 255, 0.1);
-}
-
-.carousel-card:hover {
-  filter: brightness(1.1);
-}
-
-.carousel-card.active {
-  box-shadow: 0 0 30px var(--shadow-glow, rgba(255, 255, 255, 0.4));
-  border: 2px solid var(--accent, #fff);
-}
-
-/* Glass Reflection Effect */
-.card-reflection {
-  position: absolute;
-  bottom: -105%;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  border-radius: 20px;
-  background-size: cover;
-  background-position: center;
-  transform: scaleY(-1);
-  opacity: 0.3;
-  -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.5) 0%, transparent 40%);
-  mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.5) 0%, transparent 40%);
-}
-
-.carousel-btn {
-  position: absolute;
-  z-index: 20;
-  background: rgba(255, 255, 255, 0.1) !important;
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
-  border-radius: 50% !important;
-  width: 50px;
-  height: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2rem;
-  padding: 0 !important;
-  transition: background 0.3s ease;
-}
-
-.carousel-btn:hover {
-  background: rgba(255, 255, 255, 0.25) !important;
-}
-
-.carousel-btn.left {
-  left: 5%;
-}
-
-.carousel-btn.right {
-  right: 5%;
-}
-
-/* --- MOBILE OPTIMIZATIONS --- */
-@media (max-width: 768px) {
-  .carousel-wrapper {
-    margin: 20px 0;
-    padding: 20px 0;
-  }
-
-  .carousel-btn {
-    width: 40px;
-    height: 40px;
-    font-size: 1rem;
-    /* Move buttons closer to edges on small screens */
-  }
-
-  .carousel-btn.left {
-    left: 10px;
-  }
-
-  .carousel-btn.right {
-    right: 10px;
-  }
-
-  /* Reduces rendering load on mobile by dropping shadow intensity */
-  .carousel-card.active {
-    box-shadow: 0 0 20px var(--shadow-glow, rgba(255, 255, 255, 0.3));
-  }
-}
-
-/* --- RESPONSIVE 3D CAROUSEL STYLES --- */
-.carousel-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  position: relative;
-  margin: 40px 0;
-  padding: 40px 0;
-  /* Extra padding ensures reflections aren't cut off */
-  overflow: hidden;
-  /* Prevents page-breaking horizontal scroll on mobile */
-  box-sizing: border-box;
-}
-
-.carousel-scene {
-  position: relative;
-  /* Fluid width that shrinks on mobile, grows on desktop */
-  width: clamp(200px, 40vw, 350px);
-
-  /* This guarantees it will ALWAYS be a perfect square */
-  aspect-ratio: 1 / 1;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transform-style: preserve-3d;
-  transition: width 0.4s ease;
-  /* Smooth resize on window drag */
 }
 
 .carousel-card {
@@ -353,7 +114,7 @@ body {
   border-radius: 20px;
   transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
   cursor: pointer;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.8);
 }
 
 .carousel-card img {
@@ -361,7 +122,7 @@ body {
   height: 100%;
   object-fit: cover;
   border-radius: 20px;
-  border: 2px solid rgba(255, 255, 255, 0.1);
+  border: 2px solid var(--glass-border);
 }
 
 .carousel-card:hover {
@@ -369,8 +130,8 @@ body {
 }
 
 .carousel-card.active {
-  box-shadow: 0 0 30px var(--shadow-glow, rgba(255, 255, 255, 0.4));
-  border: 2px solid var(--accent, #fff);
+  box-shadow: 0 0 30px var(--accent-glow);
+  border: 2px solid var(--accent-color);
 }
 
 /* Glass Reflection Effect */
@@ -385,16 +146,16 @@ body {
   background-position: center;
   transform: scaleY(-1);
   opacity: 0.3;
-  -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.5) 0%, transparent 40%);
-  mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.5) 0%, transparent 40%);
+  -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, transparent 40%);
+  mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, transparent 40%);
 }
 
 .carousel-btn {
   position: absolute;
   z-index: 20;
-  background: rgba(255, 255, 255, 0.1) !important;
-  -webkit-backdrop-filter: blur(10px);
+  background: var(--btn-bg) !important;
   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-radius: 50% !important;
   width: 50px;
   height: 50px;
@@ -404,10 +165,12 @@ body {
   font-size: 1.2rem;
   padding: 0 !important;
   transition: background 0.3s ease;
+  border: 1px solid var(--glass-border);
+  color: var(--text-main);
 }
 
 .carousel-btn:hover {
-  background: rgba(255, 255, 255, 0.25) !important;
+  background: var(--btn-hover) !important;
 }
 
 .carousel-btn.left {
@@ -418,8 +181,386 @@ body {
   right: 5%;
 }
 
-/* --- MOBILE OPTIMIZATIONS --- */
-@media (max-width: 768px) {
+
+/* ===================================================================
+   Gallery Modals & Profile Settings Styles
+   =================================================================== */
+
+.overlay-panel {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.95);
+  opacity: 0;
+  visibility: hidden;
+  z-index: 2000;
+  border-radius: var(--radius-lg);
+  padding: 40px;
+  text-align: center;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  width: 90%;
+}
+
+.overlay-panel.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, -50%) scale(1);
+  z-index: 2500;
+}
+
+.modal-panel {
+  max-width: 480px;
+}
+
+/* --- PROFILE COMPONENT SPECIFICS --- */
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 24px;
+  border-radius: 20px;
+  margin-bottom: 25px;
+  text-align: left;
+}
+
+.profile-avatar-large {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--avatar-bg);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.2rem;
+  font-weight: 800;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  border: 2px solid var(--glass-border);
+  flex-shrink: 0;
+}
+
+.mini-avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--accent-color);
+  color: var(--accent-text);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+
+.profile-info-text h2 {
+  margin: 0 0 4px 0;
+  font-size: 1.6rem;
+  letter-spacing: -0.5px;
+}
+
+.profile-info-text p {
+  margin: 0;
+  color: var(--text-sub);
+  font-size: 0.95rem;
+}
+
+.profile-stats-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.stat-card {
+  background: var(--stat-card-bg);
+  border: 1px solid var(--glass-border);
+  padding: 16px 10px;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.3s, background 0.3s;
+}
+
+.stat-card:hover {
+  background: var(--stat-card-hover);
+  transform: translateY(-2px);
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: var(--text-sub);
+  margin-top: 6px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+
+.settings-row-btn {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-radius: 14px;
+  background: var(--input-bg);
+  border: 1px solid var(--glass-border);
+}
+
+.settings-row-btn:hover {
+  background: var(--btn-hover);
+}
+
+
+/* ===================================================================
+   Gallery Advanced Stats Modal & Table Styles
+   =================================================================== */
+.stats-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease forwards;
+  padding: 20px;
+  /* Prevents card from touching edges on small screens */
+  box-sizing: border-box;
+}
+
+.stats-card {
+  width: 100%;
+  max-width: 650px;
+  border-radius: 24px;
+  padding: 35px;
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  animation: popInCard 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  max-height: 85vh;
+  /* Fits comfortably inside viewport */
+  overflow-y: auto;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.stats-card::-webkit-scrollbar {
+  width: 6px;
+}
+
+.stats-card::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.stats-card::-webkit-scrollbar-thumb {
+  background: var(--glass-border);
+  border-radius: 4px;
+}
+
+/* Responsive Grid for Stats inside Modal */
+.responsive-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 15px;
+  margin: 20px 0;
+  padding: 15px;
+  background: var(--stat-card-bg);
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.stat-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-value {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-main);
+  letter-spacing: 0.5px;
+  text-align: center;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  opacity: 0.7;
+  color: var(--text-sub);
+  margin-top: 6px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-align: center;
+}
+
+.history-table-wrapper {
+  max-height: 200px;
+  overflow-y: auto;
+  overflow-x: auto;
+  /* Allow horizontal scrolling on mobile */
+  -webkit-overflow-scrolling: touch;
+  margin-top: 10px;
+  border-radius: 8px;
+  background: var(--input-bg);
+  border: 1px solid var(--glass-border);
+}
+
+.elegant-table {
+  width: 100%;
+  min-width: 400px;
+  border-collapse: collapse;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-main);
+}
+
+.elegant-table th {
+  position: sticky;
+  top: 0;
+  background: var(--table-header-bg);
+  padding: 10px 5px;
+  color: var(--text-sub);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 0.75rem;
+  z-index: 2;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.elegant-table td {
+  padding: 10px 5px;
+  border-bottom: 1px solid var(--table-row-border);
+}
+
+.elegant-table tr:hover td {
+  background: var(--table-row-hover);
+}
+
+.text-danger {
+  color: var(--color-danger) !important;
+  font-weight: bold;
+}
+
+.text-warn {
+  color: var(--color-gold) !important;
+  font-weight: bold;
+}
+
+.star-rating {
+  color: var(--color-gold) !important;
+  letter-spacing: 2px;
+}
+
+
+/* ===================================================================
+   Worm Graph Styles (Line Chart for Error vs Time)
+   =================================================================== */
+
+.level-stats-container {
+  border-radius: 16px;
+  border: 1px solid var(--glass-border);
+  text-align: center;
+  animation: fadeIn 0.4s ease forwards;
+}
+
+.worm-point {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  transform: translate(-50%, 50%);
+  cursor: crosshair;
+  transition: transform 0.2s, background 0.2s;
+  z-index: 5;
+}
+
+.worm-point:hover {
+  transform: translate(-50%, 50%) scale(1.6);
+  background: var(--accent-color) !important;
+  box-shadow: 0 0 12px var(--accent-glow);
+  z-index: 10;
+}
+
+/* Tooltip implementation */
+.worm-point::after {
+  content: attr(data-info);
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--modal-backdrop);
+  color: var(--text-main);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  border: 1px solid var(--glass-border);
+  z-index: 100;
+  backdrop-filter: blur(10px);
+}
+
+.worm-point:hover::after {
+  opacity: 1;
+}
+
+.axis-label {
+  position: absolute;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-sub);
+  letter-spacing: 1px;
+}
+
+.y-axis-label {
+  top: -20px;
+  left: -15px;
+}
+
+.x-axis-label {
+  bottom: -35px;
+  right: -10px;
+}
+
+@keyframes popInCard {
+  0% {
+    transform: scale(0.9) translateY(20px);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* --- RESPONSIVE ADJUSTMENTS --- */
+@media (max-width: 600px) {
+  .main-panel {
+    padding: 24px;
+    border-radius: 24px;
+  }
+
   .carousel-wrapper {
     margin: 20px 0;
     padding: 20px 0;
@@ -440,6 +581,40 @@ body {
   }
 
   .carousel-card.active {
-    box-shadow: 0 0 20px var(--shadow-glow, rgba(255, 255, 255, 0.3));
+    box-shadow: 0 0 20px var(--accent-glow);
+  }
+
+  .profile-stats-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .stats-card {
+    padding: 20px;
+  }
+
+  .game-setup-card {
+    padding: 15px;
+  }
+
+  .profile-header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .stats-header {
+    flex-direction: column;
+    text-align: center;
+    justify-content: center;
+  }
+
+  .graph-header {
+    flex-direction: column;
+    align-items: center !important;
+    text-align: center;
+  }
+
+  .worm-graph-wrapper {
+    width: 90% !important;
+    margin-bottom: 25px !important;
   }
 }

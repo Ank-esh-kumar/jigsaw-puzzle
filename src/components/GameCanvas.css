@@ -5,7 +5,10 @@
 /* --- 3D INFINITE CYBER GRID --- */
 .cyber-grid-wrapper {
   position: absolute;
-  top: 0; left: 0; width: 100vw; height: 100vh;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
   overflow: hidden;
   perspective: 600px;
   z-index: -20;
@@ -13,20 +16,31 @@
 
 .cyber-grid {
   position: absolute;
-  bottom: -40%; left: -50%; 
-  width: 200%; height: 150%;
+  bottom: -40%;
+  left: -50%;
+  width: 200%;
+  height: 150%;
   background-size: 60px 60px;
   transform: rotateX(75deg);
   animation: gridMove 2s linear infinite;
 }
 
 @keyframes gridMove {
-  0% { transform: rotateX(75deg) translateY(0); }
-  100% { transform: rotateX(75deg) translateY(60px); }
+  0% {
+    transform: rotateX(75deg) translateY(0);
+  }
+
+  100% {
+    transform: rotateX(75deg) translateY(60px);
+  }
 }
 
 .grid-vignette {
-  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   z-index: -15;
   pointer-events: none;
 }
@@ -37,8 +51,15 @@
 }
 
 @keyframes popInCard {
-  0% { transform: scale(0.85); opacity: 0; }
-  100% { transform: scale(1); opacity: 1; }
+  0% {
+    transform: scale(0.85);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 /* --- CLAY BUTTON STYLING --- */
@@ -48,23 +69,23 @@
   border-radius: 12px;
   font-weight: bold;
   cursor: pointer;
-  box-shadow: 
-    6px 6px 12px rgba(0, 0, 0, 0.5), 
-    -6px -6px 12px rgba(255, 255, 255, 0.03), 
-    inset 2px 2px 4px rgba(255, 255, 255, 0.08), 
+  box-shadow:
+    6px 6px 12px rgba(0, 0, 0, 0.5),
+    -6px -6px 12px rgba(255, 255, 255, 0.03),
+    inset 2px 2px 4px rgba(255, 255, 255, 0.08),
     inset -2px -2px 4px rgba(0, 0, 0, 0.3);
   transition: all 0.2s;
 }
 
 .clay-btn-sm:active {
-  box-shadow: 
-    inset 6px 6px 12px rgba(0, 0, 0, 0.6), 
+  box-shadow:
+    inset 6px 6px 12px rgba(0, 0, 0, 0.6),
     inset -6px -6px 12px rgba(255, 255, 255, 0.05);
   transform: translateY(2px);
 }
 
-.clay-btn-sm:hover { 
-  filter: brightness(1.2); 
+.clay-btn-sm:hover {
+  filter: brightness(1.2);
 }
 
 /* --- PIECE PROGRESS INDICATOR --- */
@@ -124,6 +145,7 @@
     opacity: 1;
     transform: translateY(0) rotate(0deg) scale(1);
   }
+
   100% {
     opacity: 0;
     transform: translateY(100vh) rotate(720deg) scale(0.5);
@@ -132,9 +154,17 @@
 
 /* --- PIECE SNAP GLOW EFFECT --- */
 @keyframes snapGlow {
-  0% { filter: brightness(1) drop-shadow(0 0 0px transparent); }
-  50% { filter: brightness(1.3) drop-shadow(0 0 15px var(--accent)); }
-  100% { filter: brightness(1) drop-shadow(0 0 0px transparent); }
+  0% {
+    filter: brightness(1) drop-shadow(0 0 0px transparent);
+  }
+
+  50% {
+    filter: brightness(1.3) drop-shadow(0 0 15px var(--accent));
+  }
+
+  100% {
+    filter: brightness(1) drop-shadow(0 0 0px transparent);
+  }
 }
 
 /* --- GESTURE CONTROL STATUS OVERLAY --- */
@@ -143,8 +173,15 @@
 }
 
 @keyframes slideUpIn {
-  0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
-  100% { opacity: 1; transform: translateX(-50%) translateY(0); }
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
 }
 
 .gesture-spinner {
@@ -158,7 +195,9 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* --- GESTURE TOGGLE BUTTON --- */
@@ -167,9 +206,17 @@
 }
 
 @keyframes gestureLoadBar {
-  0% { transform: translateX(-100%); }
-  50% { transform: translateX(0%); }
-  100% { transform: translateX(100%); }
+  0% {
+    transform: translateX(-100%);
+  }
+
+  50% {
+    transform: translateX(0%);
+  }
+
+  100% {
+    transform: translateX(100%);
+  }
 }
 
 /* --- GESTURE CONTROL INSTRUCTIONS (shown on first activation) --- */
@@ -183,4 +230,85 @@
   max-width: 400px;
   text-align: center;
   animation: popInCard 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ===================================================================
+   CINEMATIC WIN SEQUENCE ANIMATIONS
+   =================================================================== */
+
+/* Phase 1: Slow Board Blink */
+.board-blink-animate {
+  animation: boardBlink 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes boardBlink {
+  0% {
+    filter: brightness(1) contrast(1);
+    transform: scale(1);
+  }
+
+  50% {
+    filter: brightness(1.6) drop-shadow(0 0 20px rgba(255, 255, 255, 0.6));
+    transform: scale(1.03);
+  }
+
+  100% {
+    filter: brightness(1) contrast(1);
+    transform: scale(1);
+  }
+}
+
+/* Phase 2: Confetti Ribbons */
+.confetti-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 90;
+  /* Below the Win Card */
+  overflow: hidden;
+}
+
+.confetti-piece {
+  position: absolute;
+  top: -20px;
+  opacity: 0;
+  animation: fallFrames linear forwards;
+}
+
+@keyframes fallFrames {
+  0% {
+    top: -20px;
+    opacity: 1;
+    transform: translateY(0) rotate(0deg);
+  }
+
+  100% {
+    top: 100vh;
+    opacity: 1;
+    transform: translateY(0) rotate(720deg);
+  }
+}
+
+/* Phase 3: The Win Card Popup */
+.win-card-animate {
+  animation: popInCard 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes popInCard {
+  0% {
+    transform: scale(0.8) translateY(30px);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+.page-exit {
+  animation: cinematicExit 0.8s cubic-bezier(0.76, 0, 0.24, 1) forwards;
 }
