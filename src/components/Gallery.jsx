@@ -11,7 +11,7 @@ import img8 from '../assets/images/img8.jpg';
 import img9 from '../assets/images/img9.jpg';
 
 const getPlayerData = () => {
-  try { return JSON.parse(localStorage.getItem('puzzlePlayerData') || '{}'); }
+  try { return JSON.parse(localStorage.getItem('puzzlePlayerData') || '{}'); } 
   catch { return {}; }
 };
 
@@ -22,7 +22,7 @@ const renderStars = (count) => {
 const StatsModal = ({ colors, onClose, theme }) => {
   const performance = JSON.parse(localStorage.getItem('mainGamePerformance') || '[]');
   const [graphLevel, setGraphLevel] = useState(3);
-
+  
   const totalGames = performance.length;
   const bestTime = totalGames > 0 ? Math.min(...performance.map(p => p.time)).toFixed(2) : '--';
   const totalStars = performance.reduce((acc, curr) => acc + (curr.stars || 0), 0);
@@ -43,7 +43,7 @@ const StatsModal = ({ colors, onClose, theme }) => {
   const maxE = Math.max(...sortedData.map(l => l.errors), 1);
 
   const wormPath = useMemo(() => {
-    if (sortedData.length < 2) return '';
+    if (sortedData.length < 2) return ''; 
     return sortedData.map((d, i) => {
       const x = (d.time / maxT) * 100;
       const y = 100 - (d.errors / maxE) * 100;
@@ -55,7 +55,6 @@ const StatsModal = ({ colors, onClose, theme }) => {
 
   return (
     <div className="stats-modal" onClick={onClose}>
-      {/* Removed hardcoded max-width, letting CSS handle responsiveness */}
       <div className="stats-card ios-glass" onClick={e => e.stopPropagation()} style={{ background: colors.panel, borderColor: colors.accent }}>
         <div className="stats-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', gap: '10px' }}>
           <h2 className="rainbow-text" style={{ margin: 0, fontSize: '1.6rem', textAlign: 'left' }}>Advanced Statistics</h2>
@@ -73,10 +72,10 @@ const StatsModal = ({ colors, onClose, theme }) => {
         <div className="level-stats-container ios-glass-inset" style={{ margin: '25px 0', padding: '20px' }}>
           <div className="graph-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px', flexWrap: 'wrap', gap: '15px' }}>
             <h4 className="theme-text-main" style={{ margin: 0, fontSize: '1rem', textAlign: 'left' }}>Performance Graph</h4>
-            <select
-              value={graphLevel}
-              onChange={(e) => setGraphLevel(Number(e.target.value))}
-              className="form-input"
+            <select 
+              value={graphLevel} 
+              onChange={(e) => setGraphLevel(Number(e.target.value))} 
+              className="form-input" 
               style={{ padding: '8px 12px', fontSize: '0.85rem', width: '130px', margin: 0 }}
             >
               <option value="3">3x3 Level</option>
@@ -85,24 +84,24 @@ const StatsModal = ({ colors, onClose, theme }) => {
               <option value="10">10x10 Level</option>
             </select>
           </div>
-
+          
           {sortedData.length === 0 ? (
             <p className="theme-text-sub" style={{ fontSize: '0.9rem', fontStyle: 'italic', padding: '20px 0' }}>Play this level to generate graph data!</p>
           ) : (
             <div className="worm-graph-wrapper" style={{ position: 'relative', height: '160px', width: '90%', maxWidth: '500px', margin: '0 auto 35px auto', borderLeft: `2px solid var(--text-sub)`, borderBottom: `2px solid var(--text-sub)`, boxSizing: 'border-box' }}>
               <span className="axis-label y-axis-label">Errors</span>
               <span className="axis-label x-axis-label">Time (s)</span>
-
+              
               <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', overflow: 'visible', pointerEvents: 'none' }}>
-                <path
-                  d={wormPath}
-                  fill="none"
-                  stroke={graphLineColor}
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+                <path 
+                  d={wormPath} 
+                  fill="none" 
+                  stroke={graphLineColor} 
+                  strokeWidth="3" 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
                   vectorEffect="non-scaling-stroke"
-                  style={{ filter: `drop-shadow(0px 0px 6px var(--glass-border))` }}
+                  style={{ filter: `drop-shadow(0px 0px 6px var(--glass-border))` }} 
                 />
               </svg>
 
@@ -110,9 +109,9 @@ const StatsModal = ({ colors, onClose, theme }) => {
                 const posX = (d.time / maxT) * 100;
                 const posY = (d.errors / maxE) * 100;
                 return (
-                  <div
+                  <div 
                     key={i}
-                    className="worm-point"
+                    className="worm-point" 
                     style={{ left: `${posX}%`, bottom: `${posY}%`, backgroundColor: graphLineColor }}
                     data-info={`Game #${d.gameNum} | ${d.time}s, ${d.errors} err`}
                   />
@@ -162,7 +161,7 @@ const StatsModal = ({ colors, onClose, theme }) => {
 
 const Gallery = ({ onSelect, setDiff, theme, colors, toggleTheme, setGestureEnabled, gestureEnabled, onHome }) => {
   const [isExiting, setIsExiting] = useState(false);
-  const [showStats, setShowStats] = useState(false);
+  const [showStats, setShowStats] = useState(false); 
   const [showProfileSettings, setShowProfileSettings] = useState(false);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [localDiff, setLocalDiff] = useState(3);
@@ -219,8 +218,80 @@ const Gallery = ({ onSelect, setDiff, theme, colors, toggleTheme, setGestureEnab
     if (swipeDistance < -50) prevSlide();
   };
 
-  const handleSelection = (url) => { setIsExiting(true); setTimeout(() => onSelect(url), 1500); };
-  const handleUpload = (e) => { const file = e.target.files[0]; if (file) handleSelection(URL.createObjectURL(file)); };
+  const handleSelection = (url) => { setIsExiting(true); setTimeout(() => onSelect(url), 800); };
+  
+  // --- BULLETPROOF EXIF AUTO-ROTATION FOR UPLOADED IMAGES ---
+  const handleUpload = (e) => { 
+    const file = e.target.files[0]; 
+    if (!file) return; 
+
+    // Step 1: Read EXIF Data
+    const reader = new FileReader();
+    reader.onload = function(event) {
+      const view = new DataView(event.target.result);
+      let orientation = 1;
+      
+      if (view.getUint16(0, false) === 0xFFD8) {
+        const length = view.byteLength;
+        let offset = 2;
+        while (offset < length) {
+          if (view.getUint16(offset + 2, false) <= 8) break;
+          const marker = view.getUint16(offset, false);
+          offset += 2;
+          if (marker === 0xFFE1) {
+            if (view.getUint32(offset += 2, false) !== 0x45786966) break;
+            const little = view.getUint16(offset += 6, false) === 0x4949;
+            offset += view.getUint32(offset + 4, little);
+            const tags = view.getUint16(offset, little);
+            offset += 2;
+            for (let i = 0; i < tags; i++) {
+              if (view.getUint16(offset + (i * 12), little) === 0x0112) {
+                orientation = view.getUint16(offset + (i * 12) + 8, little);
+                break;
+              }
+            }
+            break;
+          } else if ((marker & 0xFF00) !== 0xFF00) break;
+          else offset += view.getUint16(offset, false);
+        }
+      }
+
+      // Step 2: Draw to hidden canvas and correct orientation natively
+      const imgReader = new FileReader();
+      imgReader.onload = (imgEvent) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          let width = img.width;
+          let height = img.height;
+          
+          if (4 < orientation && orientation < 9) {
+            canvas.width = height; canvas.height = width;
+          } else {
+            canvas.width = width; canvas.height = height;
+          }
+
+          switch (orientation) {
+            case 2: ctx.transform(-1, 0, 0, 1, width, 0); break;
+            case 3: ctx.transform(-1, 0, 0, -1, width, height); break;
+            case 4: ctx.transform(1, 0, 0, -1, 0, height); break;
+            case 5: ctx.transform(0, 1, 1, 0, 0, 0); break;
+            case 6: ctx.transform(0, 1, -1, 0, height, 0); break;
+            case 7: ctx.transform(0, -1, -1, 0, height, width); break;
+            case 8: ctx.transform(0, -1, 1, 0, 0, width); break;
+            default: ctx.transform(1, 0, 0, 1, 0, 0);
+          }
+          
+          ctx.drawImage(img, 0, 0);
+          handleSelection(canvas.toDataURL('image/jpeg', 1.0)); // Send pristine, perfectly upright image!
+        };
+        img.src = imgEvent.target.result;
+      };
+      imgReader.readAsDataURL(file);
+    };
+    reader.readAsArrayBuffer(file);
+  };
 
   const handleLevelChange = (e) => {
     const val = Number(e.target.value);
@@ -230,7 +301,7 @@ const Gallery = ({ onSelect, setDiff, theme, colors, toggleTheme, setGestureEnab
 
   const handleHomeClick = () => {
     setIsExiting(true);
-    setTimeout(() => { if (onHome) onHome(); }, 1500);
+    setTimeout(() => { if(onHome) onHome(); }, 800);
   };
 
   const isAnyModalOpen = showProfileSettings || isHelpOpen;
@@ -238,13 +309,10 @@ const Gallery = ({ onSelect, setDiff, theme, colors, toggleTheme, setGestureEnab
   return (
     <div className={`gallery-wrapper cinematic-enter ${isExiting ? 'page-exit' : ''} ${theme === 'dark' ? 'dark-theme' : 'light-theme'}`}>
 
-      {/* --- GLOBAL BLUR BACKDROP --- */}
       <div className={`global-backdrop ${isAnyModalOpen || showStats ? 'active' : ''}`} onClick={() => { setShowProfileSettings(false); setIsHelpOpen(false); setShowStats(false); }}></div>
 
-      {/* --- STATS MODAL --- */}
       {showStats && <StatsModal colors={colors} onClose={() => setShowStats(false)} theme={theme} />}
 
-      {/* --- HELP MODAL --- */}
       <div className={`overlay-panel modal-panel help-screen ios-glass ${isHelpOpen ? 'active' : ''}`}>
         <div className="icon-pulse mb-3" style={{ fontSize: '3.5rem' }}>📖</div>
         <h1 className="elegant-title">How to Play</h1>
@@ -259,13 +327,9 @@ const Gallery = ({ onSelect, setDiff, theme, colors, toggleTheme, setGestureEnab
         <button className="ios-btn highlight-btn" style={{ width: '100%', marginTop: '20px' }} onClick={() => setIsHelpOpen(false)}>Understood</button>
       </div>
 
-      {/* --- PROFILE & SETTINGS CARD MODAL --- */}
       <div className={`overlay-panel modal-panel profile-settings-screen ios-glass ${showProfileSettings ? 'active' : ''}`}>
-
         <div className="profile-header ios-glass-inset">
-          <div className="profile-avatar-large">
-            {playerData.name ? playerData.name.charAt(0).toUpperCase() : 'U'}
-          </div>
+          <div className="profile-avatar-large">{playerData.name ? playerData.name.charAt(0).toUpperCase() : 'U'}</div>
           <div className="profile-info-text">
             <h2 className="rainbow-text">{playerData.name || 'Guest Explorer'}</h2>
             <p>{playerData.email || 'Not registered'}</p>
@@ -273,14 +337,8 @@ const Gallery = ({ onSelect, setDiff, theme, colors, toggleTheme, setGestureEnab
         </div>
 
         <div className="profile-stats-grid" style={{ gridTemplateColumns: '1fr 1fr', marginBottom: '25px' }}>
-          <div className="stat-card">
-            <span className="stat-value">{totalGames}</span>
-            <span className="stat-label">Total Matches</span>
-          </div>
-          <div className="stat-card">
-            <span className="stat-value text-gold">{totalStars}</span>
-            <span className="stat-label">Stars Collected</span>
-          </div>
+          <div className="stat-card"><span className="stat-value">{totalGames}</span><span className="stat-label">Total Matches</span></div>
+          <div className="stat-card"><span className="stat-value text-gold">{totalStars}</span><span className="stat-label">Stars Collected</span></div>
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -322,15 +380,11 @@ const Gallery = ({ onSelect, setDiff, theme, colors, toggleTheme, setGestureEnab
         </div>
       </div>
 
-      {/* --- MAIN GALLERY PANEL --- */}
       <div className="ios-glass main-panel">
-
-        {/* Top Action Bar (Home Button & Profile Trigger) */}
         <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', marginBottom: '15px' }}>
           <button className="ios-btn ghost-btn" onClick={handleHomeClick} style={{ padding: '6px 16px', borderRadius: '30px' }}>
             <span style={{ marginRight: '6px', fontSize: '1.1rem' }}>⬅</span> Home
           </button>
-
           <button className="ios-btn ghost-btn" onClick={() => setShowProfileSettings(true)} style={{ padding: '6px 16px', borderRadius: '30px' }}>
             <span className="mini-avatar">{playerData.name ? playerData.name.charAt(0).toUpperCase() : 'U'}</span>
             <span style={{ marginLeft: '8px' }}>{playerData.name || 'Settings'}</span>
@@ -341,7 +395,6 @@ const Gallery = ({ onSelect, setDiff, theme, colors, toggleTheme, setGestureEnab
         <p className="theme-text-sub" style={{ marginBottom: '35px', fontSize: '0.95rem' }}>Configure your game and select a blueprint.</p>
 
         <div className="game-setup-card ios-glass" style={{ marginBottom: '35px', padding: '20px', borderRadius: '20px', background: 'var(--stat-card-bg)', border: `1px solid var(--glass-border)`, display: 'flex', flexDirection: 'column', gap: '15px' }}>
-
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
             <div className="theme-text-main" style={{ fontSize: '1.1rem', fontWeight: 600 }}>Grid Complexity</div>
             <select onChange={handleLevelChange} className="form-input" value={localDiff} style={{ minWidth: '120px', fontWeight: 'bold', padding: '8px 12px', width: 'auto', margin: 0 }}>
@@ -351,9 +404,7 @@ const Gallery = ({ onSelect, setDiff, theme, colors, toggleTheme, setGestureEnab
               <option value="10">Sector 10x10</option>
             </select>
           </div>
-
           <div style={{ height: '1px', background: 'var(--glass-border)', width: '100%' }}></div>
-
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <span style={{ fontSize: '1.4rem', opacity: gestureEnabled ? 1 : 0.5, transition: 'opacity 0.3s' }}>✋</span>

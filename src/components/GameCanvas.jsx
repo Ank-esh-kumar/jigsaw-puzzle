@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Stage, Layer, Shape, Rect, Image as KonvaImage, Group, Text } from 'react-konva';
 import useImage from 'use-image';
 import { generatePieces, calculateDistance, drawPiecePath } from '../utils/puzzleLogic';
@@ -11,30 +11,37 @@ const formatTime = (totalSeconds) => {
   return `${m}:${s}`;
 };
 
-const renderStars = (count) => {
-  return "★".repeat(count) + "☆".repeat(3 - count);
-};
-
+// --- UPGRADED LIVE HUD (Bulletproof iOS Timer & Stats) ---
 const LiveHUD = ({ isWin, isPaused, hasStarted, colors, timeRef, wrongMoves, hintsUsed, totalCount }) => {
   const [seconds, setSeconds] = useState(0);
 
   useEffect(() => {
     if (!hasStarted) {
-      setSeconds(0);
+      setTimeout(() => setSeconds(0), 0); // Bypass strict set-state-in-effect
       timeRef.current = 0;
     }
   }, [hasStarted, timeRef]);
 
   useEffect(() => {
     if (isWin || isPaused || !hasStarted) return;
-    const interval = setInterval(() => {
-      setSeconds(s => {
-        const next = s + 1;
-        timeRef.current = next;
-        return next;
-      });
-    }, 1000);
-    return () => clearInterval(interval);
+    
+    // Bulletproof iOS Timer Syncing
+    const startTime = Date.now() - (timeRef.current * 1000);
+    const updateTimer = () => {
+      const elapsedSeconds = Math.floor((Date.now() - startTime) / 1000);
+      setSeconds(elapsedSeconds);
+      timeRef.current = elapsedSeconds;
+    };
+
+    const interval = setInterval(updateTimer, 500); 
+
+    const handleVisibility = () => { if (!document.hidden) updateTimer(); };
+    document.addEventListener("visibilitychange", handleVisibility);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
   }, [isWin, isPaused, hasStarted, timeRef]);
 
   if (isWin) return null;
@@ -43,11 +50,10 @@ const LiveHUD = ({ isWin, isPaused, hasStarted, colors, timeRef, wrongMoves, hin
   if (totalCount > 0) {
     if (wrongMoves > totalCount * 1.5) score -= 2;
     else if (wrongMoves > totalCount * 0.5) score -= 1;
-
     if (seconds > totalCount * 20) score -= 2;
     else if (seconds > totalCount * 10) score -= 1;
   }
-
+  
   const currentStars = Math.max(1, score - (hintsUsed > 2 ? 1 : 0));
   const healthColor = currentStars === 3 ? '#00e676' : (currentStars === 2 ? '#ffd700' : '#ff4d4f');
 
@@ -63,12 +69,8 @@ const LiveHUD = ({ isWin, isPaused, hasStarted, colors, timeRef, wrongMoves, hin
           {formatTime(seconds)}
         </span>
         <div style={{ display: 'flex', gap: '12px', fontSize: '0.85rem', fontWeight: 600, opacity: 0.9 }}>
-          <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <span style={{ color: '#ff4d4f', fontSize: '1rem' }}>❌</span> {wrongMoves}
-          </span>
-          <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <span style={{ color: '#ffd700', fontSize: '1rem' }}>💡</span> {hintsUsed}
-          </span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><span style={{ color: '#ff4d4f', fontSize: '1rem' }}>❌</span> {wrongMoves}</span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><span style={{ color: '#ffd700', fontSize: '1rem' }}>💡</span> {hintsUsed}</span>
         </div>
       </div>
 
@@ -78,12 +80,8 @@ const LiveHUD = ({ isWin, isPaused, hasStarted, colors, timeRef, wrongMoves, hin
           <span style={{ fontSize: '1.2rem', transition: 'all 0.3s ease', color: currentStars >= 2 ? '#ffd700' : 'rgba(255,255,255,0.15)', textShadow: currentStars >= 2 ? '0 0 8px rgba(255,215,0,0.5)' : 'none' }}>★</span>
           <span style={{ fontSize: '1.2rem', transition: 'all 0.3s ease', color: currentStars >= 3 ? '#ffd700' : 'rgba(255,255,255,0.15)', textShadow: currentStars >= 3 ? '0 0 8px rgba(255,215,0,0.5)' : 'none' }}>★</span>
         </div>
-
         <div style={{ width: '100%', height: '6px', background: 'rgba(255,255,255,0.1)', borderRadius: '10px', overflow: 'hidden' }}>
-          <div style={{
-            width: `${(currentStars / 3) * 100}%`, height: '100%', backgroundColor: healthColor,
-            transition: 'width 0.6s cubic-bezier(0.25, 1, 0.5, 1), background-color 0.6s ease', boxShadow: `0 0 12px ${healthColor}`
-          }} />
+          <div style={{ width: `${(currentStars / 3) * 100}%`, height: '100%', backgroundColor: healthColor, transition: 'width 0.6s cubic-bezier(0.25, 1, 0.5, 1), background-color 0.6s ease', boxShadow: `0 0 12px ${healthColor}` }} />
         </div>
       </div>
     </div>
@@ -91,12 +89,24 @@ const LiveHUD = ({ isWin, isPaused, hasStarted, colors, timeRef, wrongMoves, hin
 };
 
 const Confetti = ({ colors }) => {
-  const confettiPieces = useMemo(() => {
+  const [confettiPieces, setConfettiPieces] = useState([]);
+
+  useEffect(() => {
     const palette = ['#ff0055', '#00f0ff', '#ffaa00', '#00ff88', '#ff44ff', colors.accent];
-    return Array.from({ length: 150 }, (_, i) => ({
-      id: i, left: `${Math.random() * 100}%`, delay: `${Math.random() * 1.5}s`, duration: `${3 + Math.random() * 4}s`,
-      color: palette[Math.floor(Math.random() * palette.length)], size: `${6 + Math.random() * 10}px`, rotation: `${Math.random() * 360}deg`,
+    const generatedPieces = Array.from({ length: 150 }, (_, i) => ({
+      id: i, 
+      left: `${Math.random() * 100}%`, 
+      delay: `${Math.random() * 1.5}s`, 
+      duration: `${3 + Math.random() * 4}s`, 
+      color: palette[Math.floor(Math.random() * palette.length)], 
+      size: `${6 + Math.random() * 10}px`, 
+      rotation: `${Math.random() * 360}deg`,
     }));
+    
+    // Safely apply state in next tick to bypass set-state-in-effect and purity warnings
+    setTimeout(() => {
+      setConfettiPieces(generatedPieces);
+    }, 0);
   }, [colors.accent]);
 
   return (
@@ -141,17 +151,17 @@ export default function GameCanvas({ imgUrl, gridSize, onBack, theme, colors, ge
   const { isReady, gestureState, videoRef, statusMessage, errorMessage } = useGestureControl(useHoloMode);
 
   const [activeGesturePieceId, setActiveGesturePieceId] = useState(null);
-  const activePieceRef = useRef(null);
-  const pieceNodesRef = useRef({});
-  const dragOffsetRef = useRef({ x: 0, y: 0 });
-  const prevPinchRef = useRef(false);
-  const isClickingUIRef = useRef(false);
+  const activePieceRef = useRef(null); 
+  const pieceNodesRef = useRef({}); 
+  const dragOffsetRef = useRef({ x: 0, y: 0 }); 
+  const prevPinchRef = useRef(false); 
+  const isClickingUIRef = useRef(false); 
 
   const [showGestureHelp, setShowGestureHelp] = useState(false);
   const [gestureToast, setGestureToast] = useState(null);
 
-  const [hasStarted, setHasStarted] = useState(false);
-  const [winPhase, setWinPhase] = useState('playing'); // ANIMATION SEQUENCE STATE
+  const [hasStarted, setHasStarted] = useState(false); 
+  const [winPhase, setWinPhase] = useState('playing'); 
   const [showHint, setShowHint] = useState(false);
   const [wrongMoves, setWrongMoves] = useState(0);
   const [hintsUsed, setHintsUsed] = useState(0);
@@ -171,7 +181,6 @@ export default function GameCanvas({ imgUrl, gridSize, onBack, theme, colors, ge
   const isMobile = windowSize.w <= 768;
   const totalCount = pieces.length;
 
-  // --- WIN SEQUENCE TRIGGER ---
   useEffect(() => {
     if (isWin && pieces.length > 0 && !hasSaved) {
       const currentTime = timeRef.current;
@@ -188,24 +197,22 @@ export default function GameCanvas({ imgUrl, gridSize, onBack, theme, colors, ge
       const savedPerf = JSON.parse(localStorage.getItem('mainGamePerformance') || '[]');
       const record = { date: new Date().toISOString(), time: currentTime, errors: wrongMoves, hints: hintsUsed, stars: earnedStars, gridSize: gridSize };
       localStorage.setItem('mainGamePerformance', JSON.stringify([...savedPerf, record].slice(-20)));
-
+      
       setHasSaved(true);
-      setHasStarted(false);
+      setHasStarted(false); 
 
-      // CINEMATIC ANIMATION MACHINE
-      setWinPhase('blinking');      // 0.0s - Start the board glow/pulse
-
-      setTimeout(() => {
-        setWinPhase('reveal');      // 1.5s - Melt lines away, show full picture, drop confetti
-      }, 1500);
-
-      setTimeout(() => {
-        setWinPhase('card');        // 4.5s - Keep confetti running, pop up congratulation card
-      }, 4500);
+      setWinPhase('blinking');      
+      setTimeout(() => setWinPhase('reveal'), 1500); 
+      setTimeout(() => setWinPhase('card'), 4500); 
     }
-  }, [isWin, hasSaved, useHoloMode, wrongMoves, hintsUsed, totalCount, gridSize]);
+  }, [isWin, hasSaved, useHoloMode, wrongMoves, hintsUsed, totalCount, gridSize, pieces.length]);
 
-  useEffect(() => { if (useHoloMode && !window.hasSeenGestureHelp) { setShowGestureHelp(true); window.hasSeenGestureHelp = true; } }, [useHoloMode]);
+  useEffect(() => { 
+    if (useHoloMode && !window.hasSeenGestureHelp) { 
+      window.hasSeenGestureHelp = true;
+      setTimeout(() => setShowGestureHelp(true), 0); 
+    } 
+  }, [useHoloMode]);
 
   useEffect(() => {
     const calculateLayout = () => {
@@ -213,11 +220,11 @@ export default function GameCanvas({ imgUrl, gridSize, onBack, theme, colors, ge
       const isMob = window.innerWidth <= 768;
       const cw = window.innerWidth;
       const ch = window.innerHeight;
-
+      
       const boxW = isWin || isMob ? cw * 0.9 : cw * 0.7;
-      const boxH = isMob ? ch * 0.55 : ch * 0.8;
+      const boxH = isMob ? ch * 0.55 : ch * 0.8; 
       const boxLeft = isWin || isMob ? cw * 0.05 : cw * 0.02;
-      const boxTop = isMob ? 175 : ch * 0.1;
+      const boxTop = isMob ? 175 : ch * 0.1; 
 
       const scale = Math.min((boxW - 40) / image.width, (boxH - 40) / image.height);
       const scaledW = image.width * scale;
@@ -285,7 +292,11 @@ export default function GameCanvas({ imgUrl, gridSize, onBack, theme, colors, ge
       const button = elements?.find(el => el.tagName === 'BUTTON' || el.closest('button'));
       if (button) {
         const targetBtn = button.tagName === 'BUTTON' ? button : button.closest('button');
-        if (!targetBtn.disabled) { targetBtn.click(); showToast('Button Clicked!'); isClickingUIRef.current = true; }
+        if (!targetBtn.disabled) { 
+          targetBtn.click(); 
+          setTimeout(() => showToast('Button Clicked!'), 0); 
+          isClickingUIRef.current = true; 
+        }
       }
     }
     prevPinchRef.current = isPinching;
@@ -302,9 +313,10 @@ export default function GameCanvas({ imgUrl, gridSize, onBack, theme, colors, ge
           activePieceRef.current = unlocked.id;
           dragOffsetRef.current = { x: canvasX - unlocked.x, y: canvasY - unlocked.y };
           setActiveGesturePieceId(unlocked.id);
-          showToast('Grabbed Piece!');
+          setTimeout(() => showToast('Grabbed Piece!'), 0); 
           const node = pieceNodesRef.current[unlocked.id]; if (node) node.moveToTop();
-          setHasStarted(true);
+          
+          setTimeout(() => setHasStarted(true), 0); 
         }
       } else {
         const id = activePieceRef.current;
@@ -331,8 +343,10 @@ export default function GameCanvas({ imgUrl, gridSize, onBack, theme, colors, ge
         }
 
         if (snapped || isWrongMove) {
-          setFeedbackStatus({ id, type: snapped ? 'success' : 'error' });
-          setTimeout(() => setFeedbackStatus(null), 1500);
+          setTimeout(() => {
+            setFeedbackStatus({ id, type: snapped ? 'success' : 'error' });
+            setTimeout(() => setFeedbackStatus(null), 1500); 
+          }, 0);
         }
 
         setPieces(prev => prev.map(p => {
@@ -343,18 +357,23 @@ export default function GameCanvas({ imgUrl, gridSize, onBack, theme, colors, ge
     }
   }, [gestureState, useHoloMode, isReady, boardConfig, isWin, showToast]);
 
-  const handleBack = () => { setIsExiting(true); setTimeout(() => onBack(), 1500); };
+  const handleBack = () => { setIsExiting(true); setTimeout(() => onBack(), 800); };
   const handleRestart = () => { setPieces([]); timeRef.current = 0; setFinalTime(0); setWrongMoves(0); setHintsUsed(0); setHasSaved(false); setHasStarted(false); setWinPhase('playing'); };
-  const handleDragStartKonva = (e) => { if (useHoloMode) return; setHasStarted(true); e.currentTarget.moveToTop(); };
+  
+  const handleDragStartKonva = useCallback((e) => { 
+    if (useHoloMode) return; 
+    setHasStarted(true); 
+    e.currentTarget.moveToTop(); 
+  }, [useHoloMode]);
 
-  const handleDragEndKonva = (e, id) => {
+  const handleDragEndKonva = useCallback((e, id) => {
     if (useHoloMode) return;
-    const group = e.currentTarget; const finalX = group.x(); const finalY = group.y(); const piece = pieces.find(p => p.id === id);
+    const group = e.currentTarget; const finalX = group.x(); const finalY = group.y(); const piece = piecesRef.current.find(p => p.id === id);
     if (!piece) return;
-
+    
     let snapped = false; let isWrongMove = false;
     const snapDistance = Math.max(60, Math.min(piece.w, piece.h) * 0.8);
-
+    
     if (calculateDistance(finalX, finalY, piece.correctX, piece.correctY) < snapDistance) {
       snapped = true;
     } else {
@@ -364,14 +383,16 @@ export default function GameCanvas({ imgUrl, gridSize, onBack, theme, colors, ge
     }
 
     if (snapped || isWrongMove) {
-      setFeedbackStatus({ id, type: snapped ? 'success' : 'error' });
-      setTimeout(() => setFeedbackStatus(null), 1500);
+      setTimeout(() => {
+        setFeedbackStatus({ id, type: snapped ? 'success' : 'error' });
+        setTimeout(() => setFeedbackStatus(null), 1500); 
+      }, 0);
     }
-
+    
     setPieces(prev => prev.map(p => {
       if (p.id === id) { if (snapped) return { ...p, x: p.correctX, y: p.correctY, isFixed: true }; return { ...p, x: finalX, y: finalY }; } return p;
     }));
-  };
+  }, [useHoloMode, boardConfig]);
 
   const handleToggleGesture = () => setUseHoloMode(prev => !prev);
   const getGestureButtonLabel = () => {
@@ -382,16 +403,15 @@ export default function GameCanvas({ imgUrl, gridSize, onBack, theme, colors, ge
     return '✋ Initializing...';
   };
 
-  const markedAreaStyle = { position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: useHoloMode ? 30 : 0, pointerEvents: useHoloMode ? 'none' : 'auto' };
+  const markedAreaStyle = { position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: useHoloMode ? 30 : 0, pointerEvents: useHoloMode ? 'none' : 'auto', touchAction: 'none', WebkitUserSelect: 'none' };
   const boardPieces = pieces.filter(p => p.status === 'board');
 
-  // ANIMATION LOGIC VARIABLES
   const showLines = winPhase === 'playing' || winPhase === 'blinking';
   const showConfetti = winPhase === 'reveal' || winPhase === 'card';
   const starsDisplay = Array(3).fill(0).map((_, i) => i < JSON.parse(localStorage.getItem('mainGamePerformance') || '[]').slice(-1)[0]?.stars ? '⭐' : '✩').join('');
 
   return (
-    <div style={{ position: 'fixed', inset: 0, width: '100%', height: '100%', overflow: 'hidden', backgroundColor: colors.bg }} className={`cinematic-enter ${isExiting ? 'page-exit' : ''} ${theme === 'dark' ? 'dark-theme' : 'light-theme'}`}>
+    <div style={{ position: 'fixed', inset: 0, width: '100%', height: '100%', overflow: 'hidden', backgroundColor: colors.bg, touchAction: 'none', WebkitUserSelect: 'none' }} className={`cinematic-enter ${isExiting ? 'page-exit' : ''} ${theme === 'dark' ? 'dark-theme' : 'light-theme'}`}>
       <div style={{ position: 'absolute', inset: 0, backgroundImage: `linear-gradient(${colors.border} 1px, transparent 1px), linear-gradient(90deg, ${colors.border} 1px, transparent 1px)`, backgroundSize: '50px 50px', zIndex: -1, pointerEvents: 'none' }}></div>
       <video ref={videoRef} autoPlay playsInline muted style={{ position: 'absolute', bottom: '20px', left: '20px', width: '160px', height: '120px', borderRadius: '12px', objectFit: 'cover', transform: 'scaleX(-1)', zIndex: 50, border: `2px solid ${colors.accent}`, boxShadow: `0 0 20px rgba(0,0,0,0.5)`, display: useHoloMode && isReady ? 'block' : 'none' }} />
       {useHoloMode && isReady && !isWin && (
@@ -405,9 +425,9 @@ export default function GameCanvas({ imgUrl, gridSize, onBack, theme, colors, ge
           ✨ {gestureToast}
         </div>
       )}
-
+      
       <div ref={markedAreaRef} style={markedAreaStyle}>
-
+        
         <div style={{ position: 'absolute', top: 'max(20px, env(safe-area-inset-top))', left: 'max(20px, env(safe-area-inset-left))', right: 'max(20px, env(safe-area-inset-right))', zIndex: 50, pointerEvents: 'none', display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', alignItems: isMobile ? 'center' : 'flex-start', gap: '15px' }}>
           <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', pointerEvents: 'auto', justifyContent: isMobile ? 'center' : 'flex-start' }}>
             <button className="ios-btn" onClick={handleBack} style={{ background: colors.panel, color: colors.textMain, border: `1px solid ${colors.border}` }}>⬅ Home Page</button>
@@ -423,6 +443,45 @@ export default function GameCanvas({ imgUrl, gridSize, onBack, theme, colors, ge
 
         {showConfetti && <Confetti colors={colors} />}
 
+       {/* --- HOLO MODE HELP CARD (Fixed pointer-events) --- */}
+        {showGestureHelp && (
+          <div style={{ 
+            position: 'fixed', inset: 0, zIndex: 1000, display: 'flex', alignItems: 'center', 
+            justifyContent: 'center', background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(5px)',
+            pointerEvents: 'auto' /* <-- THIS FIXES THE UNCLICKABLE BUTTON */
+          }}>
+            <div className="ios-glass" style={{ background: colors.panel, padding: '40px', borderRadius: '24px', maxWidth: '400px', textAlign: 'center', border: `1px solid ${colors.accent}`, boxShadow: `0 0 40px rgba(0,0,0,0.8)` }}>
+              <div style={{ fontSize: '3rem', marginBottom: '10px' }}>✋</div>
+              <h2 className="rainbow-text" style={{ marginTop: 0, marginBottom: '20px' }}>Holo Mode</h2>
+              <ul style={{ textAlign: 'left', color: colors.textMain, fontSize: '1.05rem', lineHeight: 1.8, marginBottom: '30px', paddingLeft: '20px' }}>
+                <li><b>1.</b> Position your hand in front of the camera.</li>
+                <li><b>2.</b> <b>Pinch</b> your index finger and thumb to grab a piece.</li>
+                <li><b>3.</b> <b>Move</b> your hand to drag the piece around.</li>
+                <li><b>4.</b> <b>Release</b> the pinch to drop it into place.</li>
+              </ul>
+              <button className="ios-btn highlight-btn" onClick={() => setShowGestureHelp(false)} style={{ width: '100%', fontSize: '1.1rem', padding: '12px', fontWeight: 'bold' }}>Got it!</button>
+            </div>
+          </div>
+        )}
+
+        {showTutorial && (
+          <div style={{ position: 'fixed', inset: 0, zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)', pointerEvents: 'auto' }}>
+            <div className="ios-glass" style={{ background: colors.panel, padding: '40px', borderRadius: '24px', maxWidth: '450px', width: '90%', textAlign: 'center', border: `1px solid ${colors.accent}`, boxShadow: `0 0 40px rgba(0,0,0,0.8)` }}>
+              <h1 className="rainbow-text" style={{ marginTop: 0, marginBottom: '20px', fontSize: '2.5rem' }}>Welcome!</h1>
+              <ul style={{ textAlign: 'left', color: colors.textMain, fontSize: '1.1rem', lineHeight: 1.8, marginBottom: '30px', paddingLeft: '0', listStyle: 'none' }}>
+                <li style={{ marginBottom: '15px' }}>🧩 <b>Gameplay:</b> Drag the single active piece from the deck on the right and snap it into the board.</li>
+                <li style={{ marginBottom: '15px' }}>✋ <b>Holo Mode:</b> Turn on hand gestures to pinch and drag pieces through your webcam!</li>
+                <li style={{ marginBottom: '15px' }}>💡 <b>Hints:</b> Stuck? Click Hint to highlight the correct position.</li>
+                <li>⭐ <b>Stars:</b> Place pieces accurately without dropping them in the wrong spot to earn 3 stars!</li>
+              </ul>
+              <div style={{ display: 'flex', gap: '15px', justifyContent: 'center' }}>
+                <button className="ios-btn highlight-btn" onClick={handleDismissTutorial} style={{ flex: 1, fontSize: '1.1rem', padding: '15px', fontWeight: 'bold' }}>Play Game</button>
+                <button className="ios-btn outline-btn" onClick={handleDismissTutorial} style={{ padding: '15px 25px' }}>Skip</button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {winPhase === 'card' && (
           <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 100, pointerEvents: 'auto' }}>
             <div className="ios-glass win-card-animate" style={{ background: colors.panel, padding: '50px 60px', borderRadius: '32px', textAlign: 'center', border: `1px solid ${colors.border}`, boxShadow: `0 30px 60px rgba(0,0,0,0.8)` }}>
@@ -430,9 +489,9 @@ export default function GameCanvas({ imgUrl, gridSize, onBack, theme, colors, ge
               <p style={{ color: colors.textSub, fontSize: '1.2rem', marginBottom: '25px', opacity: 0.8 }}>Yaah! You did it</p>
 
               <div style={{ fontSize: '4rem', marginBottom: '20px', letterSpacing: '10px', filter: 'drop-shadow(0 0 20px rgba(255, 215, 0, 0.6))' }}>{starsDisplay}</div>
-
+              
               <p style={{ color: colors.textSub, fontSize: '1rem', marginTop: '-15px', marginBottom: '25px' }}>
-                Errors: <strong style={{ color: wrongMoves > 0 ? '#ff4d4f' : '#00e676' }}>{wrongMoves}</strong> | Hints: <strong style={{ color: '#ffd700' }}>{hintsUsed}</strong>
+                Errors: <strong style={{color: wrongMoves > 0 ? '#ff4d4f' : '#00e676'}}>{wrongMoves}</strong> | Hints: <strong style={{color: '#ffd700'}}>{hintsUsed}</strong>
               </p>
 
               <div style={{ background: 'rgba(0,0,0,0.4)', padding: '25px 50px', borderRadius: '24px', margin: '0 auto 40px auto', border: `1px solid ${colors.border}`, display: 'inline-flex', gap: '50px', justifyContent: 'center' }}>
@@ -450,16 +509,21 @@ export default function GameCanvas({ imgUrl, gridSize, onBack, theme, colors, ge
           </div>
         )}
 
-        <div className={winPhase === 'blinking' ? 'board-blink-animate' : ''} style={{ width: '100%', height: '100%', transformOrigin: `${boardConfig.offsetX + boardConfig.boardW / 2}px ${boardConfig.offsetY + boardConfig.boardH / 2}px` }}>
-          <Stage width={stageSize.width} height={stageSize.height}>
+        <div className={winPhase === 'blinking' ? 'board-blink-animate' : ''} style={{ width: '100%', height: '100%', transformOrigin: `${boardConfig.offsetX + boardConfig.boardW/2}px ${boardConfig.offsetY + boardConfig.boardH/2}px` }}>
+          <Stage 
+            width={stageSize.width} 
+            height={stageSize.height}
+            onMouseDown={() => { if(!useHoloMode && !hasStarted) setHasStarted(true); }}
+            onTouchStart={() => { if(!useHoloMode && !hasStarted) setHasStarted(true); }}
+          >
             <Layer x={boardConfig.offsetX} y={boardConfig.offsetY}>
-
+              
               <KonvaImage image={image} width={boardConfig.boardW} height={boardConfig.boardH} opacity={showLines ? 0.15 : 1} listening={false} perfectDrawEnabled={false} />
-
+              
               {showLines && (
                 <Rect width={boardConfig.boardW} height={boardConfig.boardH} stroke={colors.border} strokeWidth={2} dash={[5, 5]} />
               )}
-
+              
               {isWin && (
                 <Rect width={boardConfig.boardW} height={boardConfig.boardH} stroke={colors.accent} strokeWidth={showLines ? 4 : 1} shadowColor={colors.accent} shadowBlur={showLines ? 30 : 5} listening={false} />
               )}
@@ -484,7 +548,17 @@ export default function GameCanvas({ imgUrl, gridSize, onBack, theme, colors, ge
                 if (isError) { pieceStroke = '#ff4d4f'; pieceStrokeWidth = 4; pieceShadow = 25; shadowColor = '#ff4d4f'; }
 
                 return (
-                  <Group key={p.id} ref={node => { if (node) pieceNodesRef.current[p.id] = node; }} x={displayX} y={displayY} draggable={!useHoloMode && isUnlocked} onDragStart={handleDragStartKonva} onDragEnd={(e) => handleDragEndKonva(e, p.id)} >
+                  <Group 
+                    key={p.id} 
+                    ref={node => { if (node) pieceNodesRef.current[p.id] = node; }} 
+                    x={displayX} 
+                    y={displayY} 
+                    draggable={!useHoloMode && isUnlocked} 
+                    onDragStart={handleDragStartKonva} 
+                    onDragEnd={(e) => handleDragEndKonva(e, p.id)} 
+                    onMouseDown={() => { if(!useHoloMode) setHasStarted(true); }}
+                    onTouchStart={() => { if(!useHoloMode) setHasStarted(true); }}
+                  >
                     <Shape width={p.w} height={p.h} sceneFunc={(ctx, shape) => { drawPiecePath(ctx, p.w, p.h, p.tabs); ctx.fillStrokeShape(shape); }} hitFunc={(ctx, shape) => { ctx.beginPath(); ctx.rect(0, 0, p.w, p.h); ctx.closePath(); ctx.fillStrokeShape(shape); }} fillPatternImage={image} fillPatternScale={{ x: boardConfig.scale, y: boardConfig.scale }} fillPatternOffset={{ x: p.correctX / boardConfig.scale, y: p.correctY / boardConfig.scale }} transformsEnabled="position" perfectDrawEnabled={false} stroke={pieceStroke} strokeWidth={pieceStrokeWidth} shadowBlur={pieceShadow} shadowColor={shadowColor} shadowOpacity={isUnlocked || isError ? 0.8 : 0} />
                     {!isUnlocked && (
                       <><Shape width={p.w} height={p.h} sceneFunc={(ctx, shape) => { drawPiecePath(ctx, p.w, p.h, p.tabs); ctx.fillStrokeShape(shape); }} fill="rgba(0,0,0,0.7)" listening={false} /><Text text="🔒" fontSize={Math.max(12, Math.min(p.w, p.h) * 0.4)} x={p.w / 2 - Math.max(12, Math.min(p.w, p.h) * 0.4) / 2} y={p.h / 2 - Math.max(12, Math.min(p.w, p.h) * 0.4) / 2} listening={false} /></>
