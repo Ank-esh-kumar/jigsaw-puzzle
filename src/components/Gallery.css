@@ -154,8 +154,8 @@ body {
   position: absolute;
   z-index: 20;
   background: var(--btn-bg) !important;
-  backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
   border-radius: 50% !important;
   width: 50px;
   height: 50px;
@@ -205,7 +205,7 @@ body {
   opacity: 1;
   visibility: visible;
   transform: translate(-50%, -50%) scale(1);
-  z-index: 2500;
+  z-index: 4000;
 }
 
 .modal-panel {
@@ -403,7 +403,6 @@ body {
   overflow-y: auto;
   overflow-x: auto;
   /* Allow horizontal scrolling on mobile */
-  -webkit-overflow-scrolling: touch;
   margin-top: 10px;
   border-radius: 8px;
   background: var(--input-bg);
@@ -505,6 +504,7 @@ body {
   transition: opacity 0.2s;
   border: 1px solid var(--glass-border);
   z-index: 100;
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
 }
 
