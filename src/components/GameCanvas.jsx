@@ -11,7 +11,7 @@ const formatTime = (totalSeconds) => {
   return `${m}:${s}`;
 };
 
-// --- UPGRADED LIVE HUD (Bulletproof iOS Timer & Stats) ---
+
 const LiveHUD = ({ isWin, isPaused, hasStarted, colors, timeRef, wrongMoves, hintsUsed, totalCount }) => {
   const [seconds, setSeconds] = useState(0);
 
@@ -25,7 +25,7 @@ const LiveHUD = ({ isWin, isPaused, hasStarted, colors, timeRef, wrongMoves, hin
   useEffect(() => {
     if (isWin || isPaused || !hasStarted) return;
     
-    // Bulletproof iOS Timer Syncing
+    // iOS Timer Syncing
     const startTime = Date.now() - (timeRef.current * 1000);
     const updateTimer = () => {
       const elapsedSeconds = Math.floor((Date.now() - startTime) / 1000);
